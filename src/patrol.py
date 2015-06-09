@@ -27,47 +27,34 @@ class Patrol():
         rospy.loginfo("Trying to reset gaze")
         self.ptuClient = actionlib.SimpleActionClient('SetPTUState',flir_pantilt_d46.msg.PtuGotoAction)
         self.ptuClient.wait_for_server()
-        rospy.loginfo("got server")
 
         goal = flir_pantilt_d46.msg.PtuGotoGoal()
         goal.pan = 0
         goal.tilt = 0
         goal.pan_vel = 1
         goal.tilt_vel = 1
-        rospy.loginfo("sending goal")
         self.ptuClient.send_goal(goal)
-        rospy.loginfo("waiting for reply")
 
     def look_at_table(self):
         rospy.loginfo("Trying to look at table")
         self.ptuClient = actionlib.SimpleActionClient('SetPTUState',flir_pantilt_d46.msg.PtuGotoAction)
         self.ptuClient.wait_for_server()
-        rospy.loginfo("got server")
 
         goal = flir_pantilt_d46.msg.PtuGotoGoal()
         goal.pan = 0
         goal.tilt = 15
         goal.pan_vel = 1
         goal.tilt_vel = 1
-        rospy.loginfo("sending goal")
         self.ptuClient.send_goal(goal)
-        rospy.loginfo("waiting for reply")
 
-    def __init__(self) :
-        rospy.init_node('aloof_patrolling', anonymous = True)
-
+    def move_to_waypoint(self,target):
         self.reset_gaze()
-
         self.client = actionlib.SimpleActionClient('/topological_navigation', topological_navigation.msg.GotoNodeAction)
-
         self.client.wait_for_server()
-        rospy.loginfo("Initialised")
+        rospy.loginfo("Movement Requested to " + target)
 
         self.navgoal = topological_navigation.msg.GotoNodeGoal()
-
-        print "Requesting Navigation"
-
-        self.navgoal.target = 'WayPoint4'
+        self.navgoal.target = target
         #self.navgoal.no_orientation = self.navgoal.no_orientation
         #navgoal.origin = orig
 
@@ -77,10 +64,27 @@ class Patrol():
         # Waits for the server to finish performing the action.
         self.client.wait_for_result()
         self.look_at_table()
+        rospy.loginfo("Observing table")
+        rospy.sleep(5)
 
-        # Prints out the result of executing the action
-        ps = self.client.get_result()
-        print ps
+        self.next_node()
+
+    def next_node(self):
+        if not self.tour:
+            self.tour = self.tables
+
+        self.move_to_waypoint(self.tour.pop())
+
+
+    def __init__(self) :
+        rospy.init_node('aloof_patrolling', anonymous = True)
+
+        self.tables =['WayPoint10','WayPoint12','WayPoint1','WayPoint4','WayPoint8','WayPoint6']
+        self.tour = self.tables
+
+        self.next_node()
+
+
 
 if __name__ == '__main__':
     p = Patrol()

@@ -71,7 +71,8 @@ class Patrol():
 
     def next_node(self):
         if not self.tour:
-            self.tour = self.tables
+            rospy.loginfo("Resetting Tour")
+            self.tour = list(self.tables)
 
         self.move_to_waypoint(self.tour.pop())
 
@@ -80,7 +81,7 @@ class Patrol():
         rospy.init_node('aloof_patrolling', anonymous = True)
 
         self.tables =['WayPoint10','WayPoint12','WayPoint1','WayPoint4','WayPoint8','WayPoint6']
-        self.tour = self.tables
+        self.tour = []
 
         self.next_node()
 

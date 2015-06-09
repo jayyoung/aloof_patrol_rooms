@@ -55,8 +55,6 @@ class Patrol():
 
         self.navgoal = topological_navigation.msg.GotoNodeGoal()
         self.navgoal.target = target
-        #self.navgoal.no_orientation = self.navgoal.no_orientation
-        #navgoal.origin = orig
 
         # Sends the goal to the action server.
         self.client.send_goal(self.navgoal)#,self.done_cb, self.active_cb, self.feedback_cb)

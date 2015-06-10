@@ -48,7 +48,7 @@ class Patrol():
         self.ptuClient.send_goal(goal)
 
     def move_to_waypoint(self,target):
-        self.reset_gaze()
+
         self.client = actionlib.SimpleActionClient('/topological_navigation', topological_navigation.msg.GotoNodeAction)
         self.client.wait_for_server()
         rospy.loginfo("Movement Requested to " + target)
@@ -61,7 +61,7 @@ class Patrol():
 
         # Waits for the server to finish performing the action.
         self.client.wait_for_result()
-        self.look_at_table()
+
         rospy.loginfo("Observing table")
         rospy.sleep(5)
 
@@ -80,7 +80,9 @@ class Patrol():
 
         self.tables =['WayPoint10','WayPoint12','WayPoint1','WayPoint4','WayPoint8','WayPoint6']
         self.tour = []
-
+        self.reset_gaze()
+        self.look_at_table()
+        
         self.next_node()
 
 
